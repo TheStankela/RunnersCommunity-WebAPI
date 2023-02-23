@@ -1,4 +1,4 @@
-﻿@model ICollection<Race>
+﻿@model IEnumerable<Race>
 
 <section class="py-5">
 	<div class="container px-4 px-lg-5 mt-5">
@@ -23,7 +23,7 @@
 						<!-- Product actions-->
 						<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
 							<a asp-controller="Race" asp-action="Details" asp-route-id="@item.Id" type="button" class="btn btn-sm btn-outline-secondary">View</a>
-							<div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Details</a></div>
+							<a asp-controller="Race" asp-action="Details" asp-route-id="@item.Id" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
 						</div>
 					</div>
 				</div>

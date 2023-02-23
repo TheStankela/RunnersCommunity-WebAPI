@@ -12,15 +12,29 @@ namespace RunGroops.Controllers
         {
             _raceRepository = raceRepository;
         }
-		public IActionResult Index()
+		public async Task<IActionResult> Index()
         {
-            var races = _raceRepository.GetAllRaces();
+            var races = await _raceRepository.GetAllRaces();
             return View(races);
         }
-		public IActionResult Details(int id)
+		public async Task<IActionResult> Details(int id)
 		{
-			var race = _raceRepository.GetRace(id);
+			var race = await _raceRepository.GetRace(id);
 			return View(race);
 		}
+        public IActionResult Create() 
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(Race race)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            _raceRepository.AddRace(race);
+            return RedirectToAction("Index");
+        }
 	}
 }

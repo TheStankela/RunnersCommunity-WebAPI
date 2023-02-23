@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RunGroops.Interfaces;
+using RunGroops.Models;
 
 namespace RunGroops.Controllers
 {
@@ -11,15 +12,29 @@ namespace RunGroops.Controllers
         {
 			_clubRepository = clubRepository;
 		}
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var clubs = _clubRepository.GetClubs();
+            var clubs = await _clubRepository.GetClubs();
             return View(clubs);
         }
-		public IActionResult Details(int id)
+		public async Task<IActionResult> Details(int id)
 		{
-			var club = _clubRepository.GetClub(id);
+			var club = await _clubRepository.GetClub(id);
 			return View(club);
+		}
+		public IActionResult Create()
+		{
+			return View();
+		}
+		[HttpPost]
+		public async Task<IActionResult> Create(Club club) 
+		{
+			if (!ModelState.IsValid)
+			{
+				return View();
+			}
+			_clubRepository.AddClub(club);
+			return RedirectToAction("Details");
 		}
 	}
 }

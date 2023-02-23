@@ -39,7 +39,7 @@ namespace RunGroops.Repository
 			return clubs;
 		}
 
-		public async Task<ICollection<Club>> GetClubs()
+		public async Task<IEnumerable<Club>> GetClubs()
 		{
 			var clubs = await _applicationDbContext.Clubs.Include(_c => _c.Address).ToListAsync();
 			return clubs;

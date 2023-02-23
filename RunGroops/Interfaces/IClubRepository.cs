@@ -4,7 +4,7 @@ namespace RunGroops.Interfaces
 {
 	public interface IClubRepository
 	{
-		public Task<ICollection<Club>> GetClubs();
+		public Task<IEnumerable<Club>> GetClubs();
 		public Task<Club> GetClub(int id);
 		public Task<IEnumerable<Club>> GetClubByCity(string city);
 		public bool AddClub(Club club);
