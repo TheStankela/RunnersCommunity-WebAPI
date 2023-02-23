@@ -1,0 +1,29 @@
+﻿@model ICollection<Club>
+
+<section class="py-5">
+	<div class="container px-4 px-lg-5 mt-5">
+		<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+			@foreach (var item in Model)
+			{
+
+				<div class="col mb-5">
+					<div class="card h-100">
+						<img class="card-img-top" src="@item.Image" />
+						<div class="card-body p-4">
+							<div class="text-center">
+								<h5 class="fw-bolder">@item.Title</h5>
+								<h6 class="fw-bolder">@item.Description</h6>
+							@item.ClubCategory
+							</div>
+						</div>
+						<div class="btn-group">
+							<a asp-controller="Club" asp-action="Details" asp-route-id="@item.Id" type="button" class="btn btn-sm btn-outline-secondary">View</a>
+							<button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</section>
+
