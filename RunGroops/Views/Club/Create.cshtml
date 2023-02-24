@@ -1,8 +1,9 @@
 ﻿@using RunGroops.Data.Enum;
-@model Club
+@using RunGroops.ViewModels;
+@model CreateClubViewModel
 
 
-<form method="post" asp-action="Create">
+<form method="post" asp-action="Create" enctype="multipart/form-data">
   <div class="mb-3">
         <label asp-for="Title" class="form-label">Title</label>
         <input asp-for="Title" class="form-control" placeholder="Title">
@@ -12,10 +13,6 @@
         <label asp-for="Description" class="form-label">Description</label>
         <input asp-for="Description" class="form-control" placeholder="Description">
         <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Image" class="form-label">Image</label>
-        <input asp-for="Image" class="form-control" placeholder="Image">
     </div>
     <div class="mb-3">
         <label asp-for="Address.Street" class="form-label">Street</label>
@@ -38,6 +35,10 @@
             <option>--Select--</option>
         </select>
         <span asp-validation-for="ClubCategory" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Image" class="form-label">Image</label>
+        <input asp-for="Image" type="file" class="form-control" placeholder="Image">
     </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
