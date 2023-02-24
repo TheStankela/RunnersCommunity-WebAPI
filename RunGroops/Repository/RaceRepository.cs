@@ -20,6 +20,12 @@ namespace RunGroops.Repository
 			return Save();
 		}
 
+		public async Task<Race> GetRaceAsyncNoTracking(int id)
+		{
+			var race = await _applicationDbContext.Races.Include(r => r.Address).AsNoTracking().FirstOrDefaultAsync(r => r.Id == id);
+			return race;
+		}
+
 		public async Task<IEnumerable<Race>> GetRacesByCity(string city)
 		{
 			var races = await _applicationDbContext.Races.Where(r => r.Address.City.Contains(city)).ToListAsync();
