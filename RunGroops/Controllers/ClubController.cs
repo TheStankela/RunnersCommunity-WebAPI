@@ -5,21 +5,21 @@ using RunGroops.ViewModels;
 
 namespace RunGroops.Controllers
 {
-    public class ClubController : Controller
-    {
+	public class ClubController : Controller
+	{
 		private readonly IClubRepository _clubRepository;
-        private readonly IPhotoService _photoService;
+		private readonly IPhotoService _photoService;
 
-        public ClubController(IClubRepository clubRepository, IPhotoService photoService)
-        {
+		public ClubController(IClubRepository clubRepository, IPhotoService photoService)
+		{
 			_clubRepository = clubRepository;
-            _photoService = photoService;
-        }
-        public async Task<IActionResult> Index()
-        {
-            var clubs = await _clubRepository.GetClubs();
-            return View(clubs);
-        }
+			_photoService = photoService;
+		}
+		public async Task<IActionResult> Index()
+		{
+			var clubs = await _clubRepository.GetClubs();
+			return View(clubs);
+		}
 		public async Task<IActionResult> Details(int id)
 		{
 			var club = await _clubRepository.GetClub(id);
@@ -30,7 +30,7 @@ namespace RunGroops.Controllers
 			return View();
 		}
 		[HttpPost]
-		public async Task<IActionResult> Create(CreateClubViewModel clubViewModel) 
+		public async Task<IActionResult> Create(CreateClubViewModel clubViewModel)
 		{
 			if (ModelState.IsValid)
 			{
@@ -48,17 +48,75 @@ namespace RunGroops.Controllers
 						Street = clubViewModel.Address.Street
 					}
 				};
-                _clubRepository.AddClub(club);
-                return RedirectToAction("Index");
-            }
+				_clubRepository.AddClub(club);
+				return RedirectToAction("Index");
+			}
 			else
 			{
 				ModelState.AddModelError("", "Photo upload failed.");
 			}
 
 			return View(clubViewModel);
-			
-			
+		}
+		public async Task<IActionResult> Edit(int id)
+		{
+			var club = await _clubRepository.GetClub(id);
+			if (club == null) return View("Error");
+			var clubViewModel = new EditClubViewModel
+			{
+				Title = club.Title,
+				Description = club.Description,
+				AddressId = club.AddressId,
+				Address = club.Address,
+				URL = club.Image,
+				ClubCategory = club.ClubCategory
+			};
+			return View(clubViewModel);
+		}
+		[HttpPost]
+		public async Task<IActionResult> Edit(int id, EditClubViewModel editClubViewModel)
+		{
+			if (!ModelState.IsValid)
+			{
+				ModelState.AddModelError("", "Failed to edit club.");
+				return View("Edit", editClubViewModel);
+
+			}
+
+			var userClub = await _clubRepository.GetClubAsyncNoTracking(id);
+
+			if (userClub != null)
+			{
+				try
+				{
+					await _photoService.DeletePhotoAsync(userClub.Image);
+				}
+				catch (Exception ex)
+				{
+					ModelState.AddModelError("", "Could not delete photo");
+					return View(editClubViewModel);
+				}
+				var photoResult = await _photoService.AddPhotoAsync(editClubViewModel.Image);
+
+				var club = new Club
+				{
+					Id = editClubViewModel.Id,
+					Title = editClubViewModel.Title,
+					Description = editClubViewModel.Description,
+					Image = photoResult.Url.ToString(),
+					AddressId = editClubViewModel.AddressId,
+					Address = editClubViewModel.Address
+				};
+
+				_clubRepository.UpdateClub(club);
+
+				return RedirectToAction("Index");
+
+			}
+			else
+			{
+				return View(editClubViewModel);
+			}
 		}
 	}
 }
