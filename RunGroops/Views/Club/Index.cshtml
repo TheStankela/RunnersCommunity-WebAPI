@@ -7,23 +7,18 @@
 		<li class="col-12 col-md-6 col-lg-4">
 			<div class="card">
 				<a type="button" asp-controller="Club" asp-action="Details" asp-route-id="@club.Id">
-					@if (@club.Image != null)
-					{
-						<img class="card-img-top" src="@club.Image" alt="Card image cap">
-					}
-					else
-					{
-						<img class="card-img-top" src="/img/rungroopclub.png" alt="Card image cap">
-					}
+					<img class="card-img-top" src="@club.Image" height="225" alt="Card image cap">
 				</a>
 				<div class="card-body">
 					<h4 class="card-title">@club.Title</h4>
 					<p class="card-text">@club.Description</p>
 					<p class="card-text">@club.Address.City, @club.Address.State</p>
 				</div>
-				<div class="card-footer card-footer-borderless d-flex justify-content-between">
+				<div class="card-footer card-footer-borderless p4 pt-0 d-flex justify-content-between">
 					<div>
 						<small>@club.ClubCategory</small>
+						<a asp-controller="Club" asp-action="Details" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">View</a>
+						<a asp-controller="Club" asp-action="Edit" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
 					</div>
 
 				</div>

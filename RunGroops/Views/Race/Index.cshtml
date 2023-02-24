@@ -1,34 +1,27 @@
 ﻿@model IEnumerable<Race>
 
-<section class="py-5">
-	<div class="container px-4 px-lg-5 mt-5">
-		<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-			@foreach (var item in Model)
-			{
-
-				<div class="col mb-5">
-					<div class="card h-100">
-						<!-- Product image-->
-						<img class="card-img-top" src="@item.Image" alt="..." />
-						<!-- Product details-->
-						<div class="card-body p-4">
-							<div class="text-center">
-								<!-- Product name-->
-								<h5 class="fw-bolder">@item.Title</h5>
-								<h6 class="fw-bolder">@item.Description</h6>
-								<!-- Product price-->
-							@item.EntryFee
-							</div>
-						</div>
-						<!-- Product actions-->
-						<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-							<a asp-controller="Race" asp-action="Details" asp-route-id="@item.Id" type="button" class="btn btn-sm btn-outline-secondary">View</a>
-							<a asp-controller="Race" asp-action="Details" asp-route-id="@item.Id" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
-						</div>
-					</div>
+<ul class="row feature-list feature-list-sm">
+	@foreach (var race in Model)
+	{
+		<li class="col-12 col-md-6 col-lg-4">
+			<div class="card">
+				<a type="button" asp-controller="Race" asp-action="Details" asp-route-id="@race.Id">
+					<img class="card-img-top" src="@race.Image" height="225" alt="Card image cap">
+				</a>
+				<div class="card-body">
+					<h4 class="card-title">@race.Title</h4>
+					<p class="card-text">@race.Description</p>
+					<p class="card-text">@race.Address.City, @race.Address.State</p>
 				</div>
-			}
-		</div>
-	</div>
-</section>
+				<div class="card-footer card-footer-borderless p4 d-flex justify-content-between">
+					<div>
+						<small>@race.RaceCategory</small>
+						<a asp-controller="Race" asp-action="Details" asp-route-id="@race.Id" type="button" class="btn btn-sm btn-outline-secondary">View</a>
+						<a asp-controller="Race" asp-action="Edit" asp-route-id="@race.Id" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
+					</div>
 
+				</div>
+			</div>
+		</li>
+	}
+</ul>
