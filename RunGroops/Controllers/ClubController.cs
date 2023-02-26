@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using RunGroops.Interfaces;
 using RunGroops.Models;
 using RunGroops.ViewModels;
@@ -118,5 +119,30 @@ namespace RunGroops.Controllers
 				return View(editClubViewModel);
 			}
 		}
+
+		public async Task<IActionResult> Delete(int id)
+		{
+			var clubToDelete = await _clubRepository.GetClub(id);
+			if (clubToDelete == null) return View("Error");
+			return View(clubToDelete);
+		}
+		[HttpPost, ActionName("Delete")]
+		public async Task<IActionResult> DeleteClub(int id)
+		{
+			var clubDetails = await _clubRepository.GetClub(id);
+			if (clubDetails == null)
+			{
+				ModelState.AddModelError("", "Something went wrong while deleting the club");
+				return View(clubDetails);
+			}
+			if (!string.IsNullOrEmpty(clubDetails.Image))
+			{
+				_ = _photoService.DeletePhotoAsync(clubDetails.Image);
+			}
+
+			_clubRepository.DeleteClub(clubDetails);
+			return RedirectToAction("Index");
+		}
 	}
 }
+
