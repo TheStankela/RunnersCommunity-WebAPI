@@ -4,7 +4,7 @@
 <ul class="row feature-list feature-list-sm">
 	@foreach (var club in Model)
 	{
-		<li class="col-12 col-md-6 col-lg-4">
+		<li class="col-12 col-md-6 pt-4 col-lg-4">
 			<div class="card">
 				<a type="button" asp-controller="Club" asp-action="Details" asp-route-id="@club.Id">
 					<img class="card-img-top" src="@club.Image" height="225" alt="Card image cap">
@@ -14,11 +14,12 @@
 					<p class="card-text">@club.Description</p>
 					<p class="card-text">@club.Address.City, @club.Address.State</p>
 				</div>
-				<div class="card-footer card-footer-borderless p4 pt-0 d-flex justify-content-between">
+				<div class="card-footer card-footer-borderless p4 d-flex justify-content-between">
 					<div>
 						<small>@club.ClubCategory</small>
 						<a asp-controller="Club" asp-action="Details" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">View</a>
 						<a asp-controller="Club" asp-action="Edit" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
+						<a asp-controller="Club" asp-action="Delete" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">Delete</a>
 					</div>
 
 				</div>
