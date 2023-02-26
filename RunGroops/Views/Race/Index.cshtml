@@ -3,7 +3,7 @@
 <ul class="row feature-list feature-list-sm">
 	@foreach (var race in Model)
 	{
-		<li class="col-12 col-md-6 col-lg-4">
+		<li class="col-12 col-md-6 pt-4 col-lg-4 ">
 			<div class="card">
 				<a type="button" asp-controller="Race" asp-action="Details" asp-route-id="@race.Id">
 					<img class="card-img-top" src="@race.Image" height="225" alt="Card image cap">
@@ -18,6 +18,7 @@
 						<small>@race.RaceCategory</small>
 						<a asp-controller="Race" asp-action="Details" asp-route-id="@race.Id" type="button" class="btn btn-sm btn-outline-secondary">View</a>
 						<a asp-controller="Race" asp-action="Edit" asp-route-id="@race.Id" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
+						<a asp-controller="Race" asp-action="Delete" asp-route-id="@race.Id" type="button" class="btn btn-sm btn-outline-secondary">Delete</a>
 					</div>
 
 				</div>
