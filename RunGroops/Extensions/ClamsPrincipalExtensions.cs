@@ -4,9 +4,9 @@ namespace RunGroops.Extensions
 {
 	public static class ClamsPrincipalExtensions
 	{
-		public static string GetUserId (this ClaimsPrincipal user)
+		public static string? GetUserId (this ClaimsPrincipal? user)
 		{
-			return user.FindFirst(ClaimTypes.NameIdentifier).Value;
+			return user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 		}
 	}
 }
