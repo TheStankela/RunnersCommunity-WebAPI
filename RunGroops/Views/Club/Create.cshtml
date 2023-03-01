@@ -4,6 +4,7 @@
 
 
 <form method="post" asp-action="Create" enctype="multipart/form-data">
+    <input type="hidden" asp-for="AppUserId" name="AppUserId" id="AppUserId">
   <div class="mb-3">
         <label asp-for="Title" class="form-label">Title</label>
         <input asp-for="Title" class="form-control" placeholder="Title">

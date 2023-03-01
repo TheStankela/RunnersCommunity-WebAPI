@@ -18,8 +18,12 @@
 					<div>
 						<small>@club.ClubCategory</small>
 						<a asp-controller="Club" asp-action="Details" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">View</a>
-						<a asp-controller="Club" asp-action="Edit" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
-						<a asp-controller="Club" asp-action="Delete" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">Delete</a>
+						@if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
+						{
+							<a asp-controller="Club" asp-action="Edit" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
+							<a asp-controller="Club" asp-action="Delete" asp-route-id="@club.Id" type="button" class="btn btn-sm btn-outline-secondary">Delete</a>
+						}
+						
 					</div>
 
 				</div>
