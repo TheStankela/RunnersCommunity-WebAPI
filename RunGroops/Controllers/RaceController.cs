@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RunGroops.Extensions;
 using RunGroops.Interfaces;
 using RunGroops.Models;
 using RunGroops.Repository;
@@ -10,11 +11,13 @@ namespace RunGroops.Controllers
 	{
 		private readonly IRaceRepository _raceRepository;
 		private readonly IPhotoService _photoService;
+		private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public RaceController(IRaceRepository raceRepository, IPhotoService photoService)
+		public RaceController(IRaceRepository raceRepository, IPhotoService photoService, IHttpContextAccessor httpContextAccessor)
 		{
 			_raceRepository = raceRepository;
 			_photoService = photoService;
+			_httpContextAccessor = httpContextAccessor;
 		}
 		public async Task<IActionResult> Index()
 		{
@@ -28,20 +31,36 @@ namespace RunGroops.Controllers
 		}
 		public IActionResult Create()
 		{
-			return View();
+			//Check if user is logged in
+			if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
+			else
+			{
+				//get current users ID
+				var curUserId = _httpContextAccessor.HttpContext?.User.GetUserId();
+				//user logged in - pass userId to viewmodel
+				var createRaceViewModel = new CreateRaceViewModel()
+				{
+					AppUserId = curUserId
+				};
+				
+				return View(createRaceViewModel);
+			}
+			
 		}
 		[HttpPost]
 		public async Task<IActionResult> Create(CreateRaceViewModel raceViewModel)
 		{
 			if (ModelState.IsValid)
 			{
+				//model state is valid => upload photo to cloudinary and map raceVM to race model
 				var result = await _photoService.AddPhotoAsync(raceViewModel.Image);
-
+				
 				var race = new Race
 				{
 					Title = raceViewModel.Title,
 					Description = raceViewModel.Description,
 					Image = result.Uri.ToString(),
+					AppUserId = raceViewModel.AppUserId,
 					Address = new Address
 					{
 						City = raceViewModel.Address.City,
@@ -61,18 +80,37 @@ namespace RunGroops.Controllers
 		}
 		public async Task<IActionResult> Edit(int id)
 		{
+			//Check if user is logged in
+			if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
+			
+			//Get the Race from database
 			var race = await _raceRepository.GetRace(id);
+			//Check if race exists
 			if (race == null) return View("Error");
-			var raceViewModel = new EditRaceViewModel
+
+			//Race exists - check if current user created that race
+			var curUserId = _httpContextAccessor.HttpContext?.User.GetUserId();
+			if (curUserId != race.AppUserId)
 			{
-				Title = race.Title,
-				Description = race.Description,
-				AddressId = race.AddressId,
-				Address = race.Address,
-				URL = race.Image,
-				RaceCategory = race.RaceCategory
-			};
-			return View(raceViewModel);
+				//Current user did not create specific race, redirect to index
+				return RedirectToAction("Index", "Home");
+			}
+			else
+			{
+				//User created specific race, populate the fields in edit View
+				var raceViewModel = new EditRaceViewModel()
+				{
+					Title = race.Title,
+					Description = race.Description,
+					AddressId = race.AddressId,
+					Address = race.Address,
+					URL = race.Image,
+					RaceCategory = race.RaceCategory,
+					AppUserId = race.AppUserId
+				};
+				return View(raceViewModel);
+			}
+			
 		}
 
 		[HttpPost]
@@ -106,7 +144,8 @@ namespace RunGroops.Controllers
 					Description = raceViewModel.Description,
 					Image = photoResult.Url.ToString(),
 					AddressId = raceViewModel.AddressId,
-					Address = raceViewModel.Address
+					Address = raceViewModel.Address,
+					AppUserId = raceViewModel.AppUserId
 				};
 
 				_raceRepository.UpdateRace(race);
@@ -120,9 +159,29 @@ namespace RunGroops.Controllers
 		}
 		public async Task<IActionResult> Delete(int id)
 		{
+			//User is not logged in - redirect to login page
+			if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
+
+			//User is logged in - get user and race details
 			var raceDetails = await _raceRepository.GetRace(id);
+			var curUserId = _httpContextAccessor.HttpContext.User.GetUserId();
+
+			//race does not exist - return error
 			if (raceDetails == null) return View("Error");
-			return View(raceDetails);
+
+			//race exists - check if the race is created by current user or if user is superAdmin
+			if (curUserId == raceDetails.AppUserId || User.IsInRole("admin"))
+			{
+				//user created the race or is admin - give the permission to delete the race
+				return View(raceDetails);
+			}
+			else
+			{
+				//user did not create the race and user is not admin - return to home page
+				return RedirectToAction("Index", "Home");
+			}
+			
+			
 		}
 
 		[HttpPost, ActionName("Delete")]
