@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using RunGroops.Extensions;
 using RunGroops.Interfaces;
 using RunGroops.Models;
 using RunGroops.ViewModels;
@@ -10,11 +11,13 @@ namespace RunGroops.Controllers
 	{
 		private readonly IClubRepository _clubRepository;
 		private readonly IPhotoService _photoService;
+		private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public ClubController(IClubRepository clubRepository, IPhotoService photoService)
+		public ClubController(IClubRepository clubRepository, IPhotoService photoService, IHttpContextAccessor httpContextAccessor)
 		{
 			_clubRepository = clubRepository;
 			_photoService = photoService;
+			_httpContextAccessor = httpContextAccessor;
 		}
 		public async Task<IActionResult> Index()
 		{
@@ -28,7 +31,11 @@ namespace RunGroops.Controllers
 		}
 		public IActionResult Create()
 		{
-			return View();
+			var createClubViewModel = new CreateClubViewModel()
+			{
+				AppUserId = _httpContextAccessor.HttpContext.User.GetUserId()
+			};
+			return View(createClubViewModel);
 		}
 		[HttpPost]
 		public async Task<IActionResult> Create(CreateClubViewModel clubViewModel)
@@ -42,6 +49,7 @@ namespace RunGroops.Controllers
 					Title = clubViewModel.Title,
 					Description = clubViewModel.Description,
 					Image = result.Uri.ToString(),
+					AppUserId = clubViewModel.AppUserId,
 					Address = new Address
 					{
 						City = clubViewModel.Address.City,
