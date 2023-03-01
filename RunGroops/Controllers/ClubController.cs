@@ -31,19 +31,27 @@ namespace RunGroops.Controllers
 		}
 		public IActionResult Create()
 		{
-			var createClubViewModel = new CreateClubViewModel()
+			//If user is not logged in, redirect him to login page
+			if (!User.Identity.IsAuthenticated) { return RedirectToAction("Login", "Account"); }
+			else
 			{
-				AppUserId = _httpContextAccessor.HttpContext.User.GetUserId()
-			};
-			return View(createClubViewModel);
+				//user logged in - pass the userId to view
+				var createClubViewModel = new CreateClubViewModel()
+				{
+					AppUserId = _httpContextAccessor.HttpContext.User.GetUserId()
+				};
+				return View(createClubViewModel);
+			}
+			
 		}
 		[HttpPost]
 		public async Task<IActionResult> Create(CreateClubViewModel clubViewModel)
 		{
 			if (ModelState.IsValid)
 			{
+				//upload photo to cloudinary if model state is valid
 				var result = await _photoService.AddPhotoAsync(clubViewModel.Image);
-
+				//map club model from clubVM
 				var club = new Club
 				{
 					Title = clubViewModel.Title,
@@ -57,6 +65,7 @@ namespace RunGroops.Controllers
 						Street = clubViewModel.Address.Street
 					}
 				};
+				//add club to database and redirect to index
 				_clubRepository.AddClub(club);
 				return RedirectToAction("Index");
 			}
@@ -69,18 +78,42 @@ namespace RunGroops.Controllers
 		}
 		public async Task<IActionResult> Edit(int id)
 		{
-			var club = await _clubRepository.GetClub(id);
-			if (club == null) return View("Error");
-			var clubViewModel = new EditClubViewModel
+			//check if user is logged in
+			if (!User.Identity.IsAuthenticated)
 			{
-				Title = club.Title,
-				Description = club.Description,
-				AddressId = club.AddressId,
-				Address = club.Address,
-				URL = club.Image,
-				ClubCategory = club.ClubCategory
-			};
-			return View(clubViewModel);
+				//not logged in - redirect him to login page
+				return RedirectToAction("Login", "Account");
+			}
+			//user is logged in - get current users id
+			var currUserId = _httpContextAccessor.HttpContext?.User.GetUserId(); 
+
+			//get requested club
+			var club = await _clubRepository.GetClub(id);
+
+			//check if requested club exists
+			if (club == null) return View("Error");
+
+			//club exists - check if current user created requested club
+			if(currUserId == club.AppUserId)
+			{
+				//user created requested club - map club model to editClubViewModel
+				var clubViewModel = new EditClubViewModel
+				{
+					Title = club.Title,
+					Description = club.Description,
+					AddressId = club.AddressId,
+					Address = club.Address,
+					URL = club.Image,
+					AppUserId = club.AppUserId,
+					ClubCategory = club.ClubCategory
+				};
+				return View(clubViewModel);
+			}
+			else
+			{
+				return RedirectToAction("Index", "Home");
+			}
+			
 		}
 		[HttpPost]
 		public async Task<IActionResult> Edit(int id, EditClubViewModel editClubViewModel)
@@ -113,6 +146,7 @@ namespace RunGroops.Controllers
 					Title = editClubViewModel.Title,
 					Description = editClubViewModel.Description,
 					Image = photoResult.Url.ToString(),
+					AppUserId = editClubViewModel.AppUserId,
 					AddressId = editClubViewModel.AddressId,
 					Address = editClubViewModel.Address
 				};
@@ -130,9 +164,28 @@ namespace RunGroops.Controllers
 
 		public async Task<IActionResult> Delete(int id)
 		{
+			//Check if user is logged in
+			if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
+
+			//User is logged in - get users Id
+			var curUserId = _httpContextAccessor.HttpContext?.User.GetUserId();
+
+			//Get requested club info
 			var clubToDelete = await _clubRepository.GetClub(id);
+
+			//Check if requested club exists
 			if (clubToDelete == null) return View("Error");
-			return View(clubToDelete);
+
+			//club exists - check if user created requested club
+			if (curUserId == clubToDelete.AppUserId)
+			{
+				return View(clubToDelete);
+			}
+			else
+			{
+				return RedirectToAction("Index", "Home");
+			}
+
 		}
 		[HttpPost, ActionName("Delete")]
 		public async Task<IActionResult> DeleteClub(int id)
