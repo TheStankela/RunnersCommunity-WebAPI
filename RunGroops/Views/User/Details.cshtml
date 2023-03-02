@@ -1,0 +1,55 @@
+﻿@using RunGroops.ViewModels;
+@model DetailsUserViewModel
+
+<section class="bg-white">
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-8">
+				<div class="media">
+					@*<img alt="Image" src="@Model.ProfileImageUrl" class="mr-md-5 avatar avatar-xlg">*@
+					<div class="media-body">
+						<div class="mb-3">
+							<h1 class="h2 mb-2">@Model.UserName</h1>
+							@*<span class="text-muted"><i class="icon-location"></i>@Model.Location</span>*@
+						</div>
+						<p class="text-muted">
+							
+							@{
+								int? pace = Model.Pace;
+								int? mileage = Model.Mileage;
+								Model.Pace = pace == null ? 0 : Model.Pace;
+								Model.Mileage = mileage == null ? 0 : Model.Mileage;
+							}
+							Pace: @Model.Pace
+						</p>
+						<p class="text-muted">Mileage: @Model.Mileage</p>
+						<p>
+							Bit of a go-getter me, creating lovely things that help others. You'll most often find me out back in the hammock, listening to tunes and bending pixels to my will.
+						</p>
+						<div>
+							<button class="btn btn-outline-primary" data-toggle="button"><i class="icon-add-user"></i> Follow</button>
+							<button class="btn btn-outline-primary">
+								<i class="icon-mail"></i>
+							</button>
+							<div class="dropdown d-inline-block">
+								<button class="btn btn-outline-primary dropdown-toggle dropdown-toggle-no-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<i class="icon-dots-three-horizontal"></i>
+								</button>
+								<div class="dropdown-menu dropdown-menu-sm" aria-labelledby="dropdownMenuButton" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 36px, 0px);">
+									<a class="dropdown-item" href="#">Add to group</a>
+									<a class="dropdown-item" href="#">Share Profile</a>
+									<div class="dropdown-divider"></div>
+									<a class="dropdown-item" href="#">Block</a>
+									<a class="dropdown-item" href="#">Report</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--end of col-->
+		</div>
+		<!--end of row-->
+	</div>
+	<!--end of container-->
+</section>
