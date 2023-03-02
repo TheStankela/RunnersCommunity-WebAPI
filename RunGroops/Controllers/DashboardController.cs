@@ -14,14 +14,21 @@ namespace RunGroops.Controllers
 		}
 		async public Task<IActionResult> Index()
 		{
-			var clubs = await _dashboardRepository.GetAllUserClubs();
-			var races = await _dashboardRepository.GetAllUserRaces();
-			var dashboardVM = new DashboardViewModel
+			if (!User.Identity.IsAuthenticated)
 			{
-				Races = races,
-				Clubs = clubs,
-			};
-			return View(dashboardVM);
+				return RedirectToAction("Login", "Account");
+			}
+			else
+			{
+				var clubs = await _dashboardRepository.GetAllUserClubs();
+				var races = await _dashboardRepository.GetAllUserRaces();
+				var dashboardVM = new DashboardViewModel
+				{
+					Races = races,
+					Clubs = clubs,
+				};
+				return View(dashboardVM);
+			}
 		}
 	}
 }
