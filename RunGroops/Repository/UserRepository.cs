@@ -15,12 +15,14 @@ namespace RunGroops.Repository
 		}
 		public bool AddUser(AppUser user)
 		{
-			throw new NotImplementedException();
+			_context.Add(user);
+			return Save();
 		}
 
 		public bool DeleteUser(AppUser user)
 		{
-			throw new NotImplementedException();
+			_context.Remove(user);
+			return Save();
 		}
 
 		public async Task<IEnumerable<AppUser>> GetAllUsers()
@@ -30,7 +32,7 @@ namespace RunGroops.Repository
 
 		public async Task<AppUser> GetUserById(string id)
 		{
-			return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+			return await _context.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
 		}
 
 		public bool Save()
@@ -42,7 +44,8 @@ namespace RunGroops.Repository
 
 		public bool UpdateUser(AppUser user)
 		{
-			throw new NotImplementedException();
+			_context.Update(user);
+			return Save();
 		}
 	}
 }
