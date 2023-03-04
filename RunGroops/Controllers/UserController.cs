@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using RunGroops.Extensions;
 using RunGroops.Interfaces;
+using RunGroops.Models;
 using RunGroops.ViewModels;
 
 namespace RunGroops.Controllers
@@ -7,10 +10,12 @@ namespace RunGroops.Controllers
 	public class UserController : Controller
 	{
 		private readonly IUserRepository _userRepository;
+		private readonly IHttpContextAccessor _httpContextAccessor;
 
-		public UserController(IUserRepository userRepository)
+		public UserController(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
 		{
 			_userRepository = userRepository;
+			_httpContextAccessor = httpContextAccessor;
 		}
 
 		[HttpGet("users")]
@@ -60,6 +65,29 @@ namespace RunGroops.Controllers
 				Pace = user.Pace
 			};
 			return View(detailUserViewModel);
+		}
+
+		public async Task<IActionResult> EditProfile(string id)
+		{
+			if(User.Identity.IsAuthenticated)
+			{
+				var requestedUser = await _userRepository.GetUserById(id);
+				var currUserId = _httpContextAccessor.HttpContext.User?.GetUserId();
+				var editProfileViewModel = new EditProfileViewModel()
+				{
+					Pace = requestedUser.Pace,
+					Mileage = requestedUser.Mileage,
+					City = requestedUser.Address.City,
+					State = requestedUser.Address.State
+				};
+				if(currUserId == requestedUser.Id)
+				{
+
+					return View(editProfileViewModel);
+				}
+				return RedirectToAction("Index");
+			}
+			return RedirectToAction("Index");
 		}
 	}
 }
